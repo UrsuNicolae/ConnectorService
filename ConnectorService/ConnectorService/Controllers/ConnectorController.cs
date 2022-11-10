@@ -2,7 +2,13 @@ using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
 using System.Reflection.PortableExecutable;
+using AutoMapper;
+using ConnectorService.Dto;
+using ConnectorService.Models;
+using ConnectorService.Queries;
 using Dapper;
+using MediatR;
+using DbType = ConnectorService.Models.Enums.DbType;
 
 namespace ConnectorService.Controllers
 {
@@ -10,21 +16,45 @@ namespace ConnectorService.Controllers
     [Route("api/[controller]/[action]")]
     public class ConnectorController : ControllerBase
     {
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
+
+        public ConnectorController(IMediator mediator, IMapper mapper)
+        {
+            _mediator = mediator;
+            _mapper = mapper;
+        }
+
         [HttpPost]
         public async Task ExecuteQuery([FromBody]string queryString )
         {
            await ExecuteCommand(queryString);
         }
 
-        [HttpGet]
-        public async Task<DataTable> GetDbScheme(string connectionString, string? schemaName)
+        [HttpPost]
+        public async Task<object> DbScheme(SchemaDto schemaDto)
         {
-            using var connection = new SqlConnection("User ID=postgres;Password=admin;Host=localhost;Port=5432;Database=postgres;Pooling=true;Connection Lifetime=0;");//"Server=localhost;Database=PayHUB;Trusted_Connection=True;");
-            await connection.OpenAsync();
-            var test = connection.GetSchemaAsync();
-            var schema = schemaName is null ? await connection.GetSchemaAsync() : await  connection.GetSchemaAsync(schemaName);
-            await connection.CloseAsync();
-            return schema;
+            try
+            {
+                var result = new SuccessModel(true, "Schema retrieved");
+                switch (schemaDto.DataBaseType)
+                {
+                    case DbType.MySql:
+                        result.data = await _mediator.Send(_mapper.Map<GetSqlDataBaseSchemaQuery>(schemaDto));
+                        break;
+                    case DbType.Postgres:
+                        result.data = await _mediator.Send(_mapper.Map<GetPostgresSqlDataBaseSchemaQuery>(schemaDto));
+                        break;
+                    default:
+                        throw new ArgumentException("Unsupported DbType");
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                return new ErrorModel(false, e.Message);
+            }
         }
 
         private async Task ExecuteCommand(string command)
