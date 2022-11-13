@@ -10,6 +10,8 @@ namespace ConnectorService.Profiles
         {
             CreateMap<SchemaDto, GetSqlDataBaseSchemaQuery>();
             CreateMap<SchemaDto, GetPostgresSqlDataBaseSchemaQuery>();
+            CreateMap<QueryDto, ExecutePostgresQuery>();
+            CreateMap<QueryDto, ExecuteSqlQuery>();
         }
     }
 }

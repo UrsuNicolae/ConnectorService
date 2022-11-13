@@ -3,10 +3,7 @@ using MediatR;
 
 namespace ConnectorService.Queries
 {
-    public class GetSqlDataBaseSchemaQuery : IRequest<DataTable>
+    public class GetSqlDataBaseSchemaQuery : GetDbScheme, IRequest<DataTable>
     {
-        public string ConnectionString { get; set; }
-
-        public string? CollectionName { get; set; }
     }
 }

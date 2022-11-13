@@ -26,9 +26,29 @@ namespace ConnectorService.Controllers
         }
 
         [HttpPost]
-        public async Task ExecuteQuery([FromBody]string queryString )
+        public async Task<object> ExecuteQuery(QueryDto queryDto)
         {
-           await ExecuteCommand(queryString);
+            try
+            {
+                var result = new SuccessModel(true, "Query Executed");
+                switch (queryDto.DataBaseType)
+                {
+                    case DbType.MySql:
+                        result.data = await _mediator.Send(_mapper.Map<ExecuteSqlQuery>(queryDto));
+                        break;
+                    case DbType.Postgres:
+                        result.data = await _mediator.Send(_mapper.Map<ExecutePostgresQuery>(queryDto));
+                        break;
+                    default:
+                        throw new ArgumentException("Unsupported DbType");
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                return new ErrorModel(false, e.Message);
+            }
         }
 
         [HttpPost]
@@ -54,20 +74,6 @@ namespace ConnectorService.Controllers
             catch (Exception e)
             {
                 return new ErrorModel(false, e.Message);
-            }
-        }
-
-        private async Task ExecuteCommand(string command)
-        {
-            using (var connection = new SqlConnection("Server=localhost;Database=PayHUB;Trusted_Connection=True;"))
-            {
-                connection.Open();
-                using (var tx = connection.BeginTransaction())
-                {
-                    var test = await connection.ExecuteAsync(command);
-                    
-                    tx.Rollback();
-                }
             }
         }
     }
