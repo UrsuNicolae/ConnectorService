@@ -12,7 +12,6 @@ using DbType = ConnectorService.Models.Enums.DbType;
 
 namespace ConnectorService.Controllers
 {
-    [ApiController]
     [Route("api/[controller]/[action]")]
     public class ConnectorController : ControllerBase
     {
@@ -26,7 +25,7 @@ namespace ConnectorService.Controllers
         }
 
         [HttpPost]
-        public async Task<object> ExecuteQuery(QueryDto queryDto)
+        public async Task<object> ExecuteQuery([FromBody]QueryDto queryDto)
         {
             try
             {
@@ -52,7 +51,7 @@ namespace ConnectorService.Controllers
         }
 
         [HttpPost]
-        public async Task<object> DbScheme(SchemaDto schemaDto)
+        public async Task<object> DbScheme([FromBody]SchemaDto schemaDto)
         {
             try
             {
