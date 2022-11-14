@@ -41,7 +41,6 @@ namespace ConnectorService.Controllers
                     default:
                         throw new ArgumentException("Unsupported DbType");
                 }
-                Console.WriteLine(result.data.ToString());
                 return result;
             }
             catch (Exception e)
