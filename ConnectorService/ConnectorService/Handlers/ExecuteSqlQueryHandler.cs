@@ -11,35 +11,29 @@ namespace ConnectorService.Handlers
         {
             if (request.QueryString.Contains("Select", StringComparison.CurrentCultureIgnoreCase))
             {
-                return ExecuteSelectAsync(request);
+                return await ExecuteSelectAsync(request);
             }
-            return ExecuteQueryAsync(request);
-
+            return await ExecuteQueryAsync(request);
         }
 
-        private async Task<string> ExecuteSelectAsync(ExecuteSqlQuery request)
+        private async Task<List<Dictionary<string, object>>> ExecuteSelectAsync(ExecuteSqlQuery request)
         {
             using (SqlConnection conn = new SqlConnection(request.ConnectionString))
             using (SqlCommand cmd = new SqlCommand(request.QueryString, conn))
             {
                 conn.Open();
                 var reader = await cmd.ExecuteReaderAsync();
-                var columns = await reader.GetColumnSchemaAsync();
-                var result = string.Empty;
-                foreach (var column in columns)
-                {
-                    result += column.ColumnName + "\t";
-                }
-                result += "\n";
+                var result = new List<Dictionary<string, object>>();
 
                 while (reader.Read())
                 {
-                    for(int i = 0; i < reader.FieldCount; i++)
+                    var row = new Dictionary<string, object>();
+                    for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        result += reader.GetValue(i) + "\t";
+                        row.Add(reader.GetName(i), reader.GetValue(i));
                     }
-                    result += "\n";
-                    }
+                    result.Add(row);
+                }
                 reader.Close();
                 cmd.Dispose();
                 conn.Close();
