@@ -50,6 +50,23 @@ namespace ConnectorService.Controllers
         }
 
         [HttpPost]
+        public async Task<object> VerifyDbConnection([FromBody] ConnectionDto connectionDto)
+        {
+            try
+            {
+                var result = new SuccessModel(true, "Connection Verified")
+                {
+                    data = await _mediator.Send(_mapper.Map<VerifyConnectionStringQuery>(connectionDto))
+                };
+                return result;
+            }
+            catch (Exception e)
+            {
+                return new ErrorModel(false, e.Message);
+            }
+        }
+
+        [HttpPost]
         public async Task<object> DbScheme([FromBody]SchemaDto schemaDto)
         {
             try

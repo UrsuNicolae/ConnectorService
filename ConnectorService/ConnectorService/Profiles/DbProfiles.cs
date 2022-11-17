@@ -8,6 +8,7 @@ namespace ConnectorService.Profiles
     {
         public DbProfile()
         {
+            CreateMap<ConnectionDto, VerifyConnectionStringQuery>();
             CreateMap<SchemaDto, GetSqlDataBaseSchemaQuery>();
             CreateMap<SchemaDto, GetPostgresSqlDataBaseSchemaQuery>();
             CreateMap<QueryDto, ExecutePostgresQuery>();

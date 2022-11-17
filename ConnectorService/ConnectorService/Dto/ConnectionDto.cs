@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ConnectorService.Models.Enums;
-using MediatR;
 
-namespace ConnectorService.Queries
+namespace ConnectorService.Dto
 {
-    public class ExecuteQuery: IRequest<object>
+    public class ConnectionDto
     {
+        [Required]
         public string ConnectionString { get; set; }
-        public string QueryString { get; set; }
 
+        [Required]
         public DbType DataBaseType { get; set; }
     }
 }
