@@ -2,15 +2,31 @@
 using MediatR;
 using Npgsql;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using Dapper;
+using System.Threading;
+using DbType = ConnectorService.Models.Enums.DbType;
 
 namespace ConnectorService.Handlers
 {
-    public class GetPostgresSqlDatabaseSchemeHandler : IRequestHandler<GetPostgresSqlDataBaseSchemaQuery, DataTable>
+    public class GetPostgresSqlDatabaseSchemeHandler : IRequestHandler<GetDbSchemeQuery, DataTable>
     {
-        public async Task<DataTable> Handle(GetPostgresSqlDataBaseSchemaQuery request, CancellationToken cancellationToken)
+        public async Task<DataTable> Handle(GetDbSchemeQuery request, CancellationToken cancellationToken)
         {
-            await using var connection = new NpgsqlConnection(request.ConnectionString); //"User ID=postgres;Password=admin;Host=localhost;Port=5432;Database=postgres;Pooling=true;Connection Lifetime=0;"//"Server=localhost;Database=PayHUB;Trusted_Connection=True;");
+            switch (request.DataBaseType)
+            {
+                case DbType.MySql:
+                    return await GetSchemeAsync<SqlConnection>(request, cancellationToken);
+                case DbType.Postgres:
+                    return await GetSchemeAsync<NpgsqlConnection>(request, cancellationToken);
+                default: throw new NotSupportedException("Unsupported database");
+            }
+        }
+
+        public async Task<DataTable> GetSchemeAsync<Connection>(GetDbSchemeQuery request, CancellationToken cancellationToken) where Connection : DbConnection
+        {
+            await using Connection connection = (Connection)Activator.CreateInstance(typeof(Connection), new object[] { request.ConnectionString });
             await connection.OpenAsync(cancellationToken);
             var schema = request.CollectionName is null ?
                 await connection.GetSchemaAsync(cancellationToken) :

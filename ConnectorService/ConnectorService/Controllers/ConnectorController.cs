@@ -30,17 +30,7 @@ namespace ConnectorService.Controllers
             try
             {
                 var result = new SuccessModel(true, "Query Executed");
-                switch (queryDto.DataBaseType)
-                {
-                    case DbType.MySql:
-                        result.data = await _mediator.Send(_mapper.Map<ExecuteSqlQuery>(queryDto));
-                        break;
-                    case DbType.Postgres:
-                        result.data = await _mediator.Send(_mapper.Map<ExecutePostgresQuery>(queryDto));
-                        break;
-                    default:
-                        throw new ArgumentException("Unsupported DbType");
-                }
+                result.data = await _mediator.Send(_mapper.Map<ExecuteQuery>(queryDto));
                 return result;
             }
             catch (Exception e)
@@ -72,17 +62,7 @@ namespace ConnectorService.Controllers
             try
             {
                 var result = new SuccessModel(true, "Schema retrieved");
-                switch (schemaDto.DataBaseType)
-                {
-                    case DbType.MySql:
-                        result.data = await _mediator.Send(_mapper.Map<GetSqlDataBaseSchemaQuery>(schemaDto));
-                        break;
-                    case DbType.Postgres:
-                        result.data = await _mediator.Send(_mapper.Map<GetPostgresSqlDataBaseSchemaQuery>(schemaDto));
-                        break;
-                    default:
-                        throw new ArgumentException("Unsupported DbType");
-                }
+                result.data = await _mediator.Send(_mapper.Map<GetDbSchemeQuery>(schemaDto));
 
                 return result;
             }
