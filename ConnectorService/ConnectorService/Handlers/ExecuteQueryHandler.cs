@@ -39,7 +39,7 @@ namespace ConnectorService.Handlers
             await using Command cmd =
                 (Command)Activator.CreateInstance(typeof(Command), new object[] { request.QueryString, conn });
             {
-                conn.Open();
+                await conn.OpenAsync();
                 var reader = await cmd.ExecuteReaderAsync();
                 var result = new List<Dictionary<string, object>>();
 
@@ -71,7 +71,7 @@ namespace ConnectorService.Handlers
             }
         }
 
-        private async Task<int> ExecuteQueryAsync<Connection, Command>(ExecuteQuery request)
+        private async Task<string> ExecuteQueryAsync<Connection, Command>(ExecuteQuery request)
             where Connection : DbConnection
             where Command : DbCommand
         {
@@ -79,12 +79,12 @@ namespace ConnectorService.Handlers
             await using Command cmd =
                 (Command)Activator.CreateInstance(typeof(Command), new object[] { request.QueryString, conn });
             {
-                conn.Open();
+                await conn.OpenAsync();
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
 
                 cmd.Dispose();
                 await conn.CloseAsync();
-                return rowsAffected;
+                return "Rows affected: " + rowsAffected;
             }
         }
     }
