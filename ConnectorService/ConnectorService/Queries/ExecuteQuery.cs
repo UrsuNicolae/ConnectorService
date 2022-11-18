@@ -8,7 +8,8 @@ namespace ConnectorService.Queries
     {
         public string ConnectionString { get; set; }
         public string QueryString { get; set; }
-
         public DbType DataBaseType { get; set; }
+        public int PageSize { get; set; }
+        public int PageNumber { get; set; }
     }
 }

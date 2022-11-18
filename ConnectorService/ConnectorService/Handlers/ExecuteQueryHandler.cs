@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Data.SqlClient;
+using ConnectorService.Helpers;
 using ConnectorService.Models.Enums;
 using ConnectorService.Queries;
 using MediatR;
@@ -30,7 +31,7 @@ namespace ConnectorService.Handlers
             
         }
 
-        private async Task<List<Dictionary<string, object>>> ExecuteSelectAsync<Connection, Command>(ExecuteQuery request)
+        private async Task<object> ExecuteSelectAsync<Connection, Command>(ExecuteQuery request)
             where Connection: DbConnection
             where Command: DbCommand
         {
@@ -42,7 +43,7 @@ namespace ConnectorService.Handlers
                 var reader = await cmd.ExecuteReaderAsync();
                 var result = new List<Dictionary<string, object>>();
 
-                while (reader.Read())
+                while (await reader.ReadAsync())
                 {
                     var row = new Dictionary<string, object>();
                     for(int i = 0; i < reader.FieldCount; i++)
@@ -54,7 +55,19 @@ namespace ConnectorService.Handlers
                 await reader.CloseAsync();
                 await cmd.DisposeAsync();
                 await conn.CloseAsync();
-                return result;
+                var currentPageResult = PagedList<Dictionary<string, object>>
+                    .ToPagedList(result, request.PageNumber, request.PageSize);
+
+                return new
+                {
+                    Results = currentPageResult,
+                    TotalCount = currentPageResult.Count,
+                    CurrentPage = currentPageResult.CurrentPage,
+                    TotalPages = currentPageResult.TotalPages,
+                    PageSize = currentPageResult.PageSize,
+                    HasPrevious = currentPageResult.HasPrevious,
+                    HasNext = currentPageResult.HasNext
+                };
             }
         }
 
