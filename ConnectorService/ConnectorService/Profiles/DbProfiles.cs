@@ -11,6 +11,7 @@ namespace ConnectorService.Profiles
             CreateMap<ConnectionDto, VerifyConnectionStringQuery>();
             CreateMap<SchemaDto, GetDbSchemeQuery>();
             CreateMap<QueryDto, ExecuteQuery>();
+            CreateMap<StringQueryDto, StringQuery>();
         }
     }
 }

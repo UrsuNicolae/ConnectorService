@@ -1,11 +1,12 @@
-using System.Text;
-using System.Text.Json.Serialization;
 using ConnectorService.Converters;
 using ConnectorService.Extensions;
 using ConnectorService.Filters;
+using ConnectorService.Policies;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +22,8 @@ builder.Services.AddControllers(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonConverterForType());
     });
 
-
+builder.Services.AddHttpClient("sqlFormat");
+builder.Services.AddSingleton(new RetryPolicy());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMediatR(typeof(Program));

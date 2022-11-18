@@ -25,6 +25,21 @@ namespace ConnectorService.Controllers
         }
 
         [HttpPost]
+        public async Task<object> FormatSqlQuery([FromBody]StringQueryDto stringQueryDto)
+        {
+            try
+            {
+                var result = new SuccessModel(true, "Query Executed");
+                result.data = await _mediator.Send(_mapper.Map<StringQuery>(stringQueryDto));
+                return result;
+            }
+            catch (Exception e)
+            {
+                return new ErrorModel(false, e.Message);
+            }
+        }
+
+        [HttpPost]
         public async Task<object> ExecuteQuery([FromBody]QueryDto queryDto)
         {
             try
