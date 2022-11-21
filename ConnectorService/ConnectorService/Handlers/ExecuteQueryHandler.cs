@@ -48,7 +48,14 @@ namespace ConnectorService.Handlers
                     var row = new Dictionary<string, object>();
                     for(int i = 0; i < reader.FieldCount; i++)
                     {
-                        row.Add(reader.GetName(i), reader.GetValue(i));
+                        if (!await reader.IsDBNullAsync(i))
+                        {
+                            row.Add(reader.GetName(i), reader.GetValue(i));
+                        }
+                        else
+                        {
+                            row.Add(reader.GetName(i), null);
+                        }
                     }
                     result.Add(row);
                 }
@@ -61,12 +68,10 @@ namespace ConnectorService.Handlers
                 return new
                 {
                     Results = currentPageResult,
-                    TotalCount = currentPageResult.Count,
+                    TotalCount = currentPageResult.TotalCount,
                     CurrentPage = currentPageResult.CurrentPage,
                     TotalPages = currentPageResult.TotalPages,
-                    PageSize = currentPageResult.PageSize,
-                    HasPrevious = currentPageResult.HasPrevious,
-                    HasNext = currentPageResult.HasNext
+                    PageSize = currentPageResult.PageSize
                 };
             }
         }
@@ -76,8 +81,7 @@ namespace ConnectorService.Handlers
             where Command : DbCommand
         {
             await using Connection conn = (Connection)Activator.CreateInstance(typeof(Connection), new object[] { request.ConnectionString });
-            await using Command cmd =
-                (Command)Activator.CreateInstance(typeof(Command), new object[] { request.QueryString, conn });
+            await using Command cmd = (Command)Activator.CreateInstance(typeof(Command), new object[] { request.QueryString, conn });
             {
                 await conn.OpenAsync();
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
