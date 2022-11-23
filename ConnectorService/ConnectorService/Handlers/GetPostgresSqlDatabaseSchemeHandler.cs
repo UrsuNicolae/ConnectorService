@@ -1,11 +1,10 @@
 ﻿using ConnectorService.Queries;
 using MediatR;
+using Microsoft.Data.Sqlite;
 using Npgsql;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using Dapper;
-using System.Threading;
 using DbType = ConnectorService.Models.Enums.DbType;
 
 namespace ConnectorService.Handlers
@@ -20,6 +19,8 @@ namespace ConnectorService.Handlers
                     return await GetSchemeAsync<SqlConnection>(request, cancellationToken);
                 case DbType.Postgres:
                     return await GetSchemeAsync<NpgsqlConnection>(request, cancellationToken);
+                case DbType.SQLite:
+                    return await GetSchemeAsync<SqliteConnection > (request, cancellationToken);
                 default: throw new NotSupportedException("Unsupported database");
             }
         }

@@ -4,6 +4,7 @@ using ConnectorService.Helpers;
 using ConnectorService.Models.Enums;
 using ConnectorService.Queries;
 using MediatR;
+using Microsoft.Data.Sqlite;
 using Npgsql;
 
 namespace ConnectorService.Handlers
@@ -26,6 +27,12 @@ namespace ConnectorService.Handlers
                         return await ExecuteSelectAsync<NpgsqlConnection, NpgsqlCommand>(request);
                     }
                     return await ExecuteQueryAsync<NpgsqlConnection, NpgsqlCommand>(request);
+                case DbType.SQLite:
+                    if (request.QueryString.Contains("Select", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        return await ExecuteSelectAsync<SqliteConnection, SqliteCommand>(request);
+                    }
+                    return await ExecuteQueryAsync<SqliteConnection, SqliteCommand>(request);
                 default: throw new NotSupportedException("Unsupported database");
             }
             

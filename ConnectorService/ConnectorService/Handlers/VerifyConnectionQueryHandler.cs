@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using ConnectorService.Queries;
 using MediatR;
+using Microsoft.Data.Sqlite;
 using Npgsql;
 using DbType = ConnectorService.Models.Enums.DbType;
 
@@ -18,6 +19,8 @@ namespace ConnectorService.Handlers
                     return await VerifyPostgresConnectionAsync<SqlConnection>(request.ConnectionString);
                 case DbType.Postgres:
                     return await VerifyPostgresConnectionAsync<NpgsqlConnection>(request.ConnectionString);
+                case DbType.SQLite:
+                    return await VerifyPostgresConnectionAsync<SqliteConnection > (request.ConnectionString);
                 default: throw new NotSupportedException("Unsupported database");
             }
         }
