@@ -12,6 +12,9 @@ namespace ConnectorService.Models.Enums
         
         [Description("SQLite")]
         SQLite = 2,
+        
+        [Description("Oracle")]
+        Oracle = 3,
 
 
     }

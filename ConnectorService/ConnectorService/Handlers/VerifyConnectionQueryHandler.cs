@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Data.Common;
+using System.Data.OracleClient;
 using System.Data.SqlClient;
 using ConnectorService.Queries;
 using MediatR;
@@ -20,7 +21,10 @@ namespace ConnectorService.Handlers
                 case DbType.Postgres:
                     return await VerifyPostgresConnectionAsync<NpgsqlConnection>(request.ConnectionString);
                 case DbType.SQLite:
-                    return await VerifyPostgresConnectionAsync<SqliteConnection > (request.ConnectionString);
+                    return await VerifyPostgresConnectionAsync<SqliteConnection> (request.ConnectionString);
+                case DbType.Oracle:
+                    return await VerifyPostgresConnectionAsync<OracleConnection> (request.ConnectionString);
+
                 default: throw new NotSupportedException("Unsupported database");
             }
         }

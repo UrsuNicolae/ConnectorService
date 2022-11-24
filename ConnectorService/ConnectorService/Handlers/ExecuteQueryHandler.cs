@@ -1,4 +1,5 @@
 ﻿using System.Data.Common;
+using System.Data.OracleClient;
 using System.Data.SqlClient;
 using ConnectorService.Helpers;
 using ConnectorService.Models.Enums;
@@ -27,12 +28,12 @@ namespace ConnectorService.Handlers
                         return await ExecuteSelectAsync<NpgsqlConnection, NpgsqlCommand>(request);
                     }
                     return await ExecuteQueryAsync<NpgsqlConnection, NpgsqlCommand>(request);
-                case DbType.SQLite:
+                case DbType.Oracle:
                     if (request.QueryString.Contains("Select", StringComparison.CurrentCultureIgnoreCase))
                     {
-                        return await ExecuteSelectAsync<SqliteConnection, SqliteCommand>(request);
+                        return await ExecuteSelectAsync<OracleConnection, OracleCommand>(request);
                     }
-                    return await ExecuteQueryAsync<SqliteConnection, SqliteCommand>(request);
+                    return await ExecuteQueryAsync<OracleConnection, OracleCommand>(request);
                 default: throw new NotSupportedException("Unsupported database");
             }
             

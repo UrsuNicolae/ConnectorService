@@ -4,6 +4,7 @@ using Microsoft.Data.Sqlite;
 using Npgsql;
 using System.Data;
 using System.Data.Common;
+using System.Data.OracleClient;
 using System.Data.SqlClient;
 using DbType = ConnectorService.Models.Enums.DbType;
 
@@ -21,6 +22,8 @@ namespace ConnectorService.Handlers
                     return await GetSchemeAsync<NpgsqlConnection>(request, cancellationToken);
                 case DbType.SQLite:
                     return await GetSchemeAsync<SqliteConnection > (request, cancellationToken);
+                case DbType.Oracle:
+                    return await GetSchemeAsync<OracleConnection> (request, cancellationToken);
                 default: throw new NotSupportedException("Unsupported database");
             }
         }
